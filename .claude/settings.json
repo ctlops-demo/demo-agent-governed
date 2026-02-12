@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm test)",
+      "Bash(npm run lint)",
+      "Bash(npm run build)",
+      "Bash(git status)",
+      "Bash(git diff)",
+      "Bash(git log)",
+      "Bash(git add)",
+      "Read",
+      "Write",
+      "Edit"
+    ],
+    "deny": [
+      "Bash(rm -rf)",
+      "Bash(curl)",
+      "Bash(wget)",
+      "Bash(ssh)",
+      "Bash(scp)",
+      "Bash(cat ~/.ssh/)",
+      "Bash(cat ~/.aws/)",
+      "Bash(cat .env)",
+      "Bash(git push --force)",
+      "Bash(chmod)",
+      "Bash(sudo)"
+    ]
+  },
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem@2.1.0", "./src", "./docs"],
+      "env": {}
+    },
+    "github": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-github@1.3.0"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    }
+  }
+}

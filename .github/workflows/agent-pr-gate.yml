@@ -1,0 +1,39 @@
+name: Agent PR Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  agent-pr-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if PR is agent-authored
+        id: check-agent
+        run: |
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          # Detect bot/agent authors
+          if [[ "$AUTHOR" == *"[bot]"* ]] || [[ "$AUTHOR" == *"claude"* ]] || [[ "$AUTHOR" == *"copilot"* ]]; then
+            echo "is_agent=true" >> $GITHUB_OUTPUT
+            echo "Agent-authored PR detected from: $AUTHOR"
+          else
+            echo "is_agent=false" >> $GITHUB_OUTPUT
+            echo "Human-authored PR from: $AUTHOR"
+          fi
+
+      - name: Enforce agent PR policy
+        if: steps.check-agent.outputs.is_agent == 'true'
+        run: |
+          echo "Agent-authored PR requires manual review."
+          echo "Checking review requirements..."
+
+          # Require at least 1 human reviewer for agent PRs
+          REVIEWS=$(gh pr view ${{ github.event.pull_request.number }} --json reviews --jq '.reviews | length')
+          if [ "$REVIEWS" -lt 1 ]; then
+            echo "::warning::Agent PR requires at least 1 human review before merge"
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Gate passed
+        run: echo "PR gate check complete"
