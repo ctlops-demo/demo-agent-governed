@@ -39,5 +39,53 @@
         "GITHUB_TOKEN": "${GITHUB_TOKEN}"
       }
     }
+  },
+  "outputFiltering": {
+    "enabled": true,
+    "rules": [
+      {
+        "name": "secretPatterns",
+        "patterns": [
+          "(?i)(api[_-]?key|token|secret|password|credential)[\s=:]+['\"]?([a-zA-Z0-9_-]{8,})['\"]?",
+          "(?i)(github[_-]?token)[\s=:]+['\"]?([a-zA-Z0-9_-]{40})['\"]?",
+          "(?i)(bearer[\s]+)([a-zA-Z0-9_.-]+)",
+          "(?i)(authorization[\s]*:[\s]*bearer[\s]+)([a-zA-Z0-9_.-]+)"
+        ],
+        "action": "redact",
+        "replacement": "[REDACTED]"
+      },
+      {
+        "name": "emailPatterns", 
+        "patterns": [
+          "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}"
+        ],
+        "action": "redact",
+        "replacement": "[EMAIL_REDACTED]"
+      },
+      {
+        "name": "sshKeys",
+        "patterns": [
+          "-----BEGIN [A-Z]+ PRIVATE KEY-----[\\s\\S]*?-----END [A-Z]+ PRIVATE KEY-----",
+          "ssh-rsa [A-Za-z0-9+/=]+",
+          "ssh-ed25519 [A-Za-z0-9+/=]+"
+        ],
+        "action": "redact",
+        "replacement": "[SSH_KEY_REDACTED]"
+      },
+      {
+        "name": "awsCredentials",
+        "patterns": [
+          "(?i)(aws[_-]?access[_-]?key[_-]?id)[\s=:]+['\"]?([A-Z0-9]{20})['\"]?",
+          "(?i)(aws[_-]?secret[_-]?access[_-]?key)[\s=:]+['\"]?([A-Za-z0-9/+=]{40})['\"]?"
+        ],
+        "action": "redact",
+        "replacement": "[AWS_CREDENTIAL_REDACTED]"
+      }
+    ],
+    "logFiltering": true,
+    "auditLog": {
+      "enabled": true,
+      "path": "./.claude/audit.log"
+    }
   }
 }
