@@ -26,17 +26,73 @@
       "Bash(sudo)"
     ]
   },
+  "outputFilters": {
+    "redactSecrets": true,
+    "redactPersonalInfo": true,
+    "patterns": [
+      {
+        "name": "API Keys",
+        "pattern": "\\b[A-Za-z0-9]{32,}\\b",
+        "replacement": "[REDACTED_API_KEY]"
+      },
+      {
+        "name": "GitHub Tokens",
+        "pattern": "\\bgh[pousr]_[A-Za-z0-9]{36}\\b",
+        "replacement": "[REDACTED_GITHUB_TOKEN]"
+      },
+      {
+        "name": "Email Addresses",
+        "pattern": "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b",
+        "replacement": "[REDACTED_EMAIL]"
+      },
+      {
+        "name": "Private Keys",
+        "pattern": "-----BEGIN [A-Z ]+PRIVATE KEY-----[\\s\\S]*?-----END [A-Z ]+PRIVATE KEY-----",
+        "replacement": "[REDACTED_PRIVATE_KEY]"
+      },
+      {
+        "name": "SSH Keys",
+        "pattern": "ssh-[a-z0-9]+ [A-Za-z0-9+/]+=*",
+        "replacement": "[REDACTED_SSH_KEY]"
+      },
+      {
+        "name": "AWS Credentials",
+        "pattern": "AKIA[0-9A-Z]{16}",
+        "replacement": "[REDACTED_AWS_KEY]"
+      },
+      {
+        "name": "Bearer Tokens",
+        "pattern": "Bearer [A-Za-z0-9._~+/-]+",
+        "replacement": "Bearer [REDACTED_TOKEN]"
+      },
+      {
+        "name": "Phone Numbers",
+        "pattern": "\\b(?:\\+?1[-. ]?)?\\(?([0-9]{3})\\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})\\b",
+        "replacement": "[REDACTED_PHONE]"
+      }
+    ]
+  },
   "mcpServers": {
     "filesystem": {
       "command": "npx",
       "args": ["@modelcontextprotocol/server-filesystem@2.1.0", "./src", "./docs"],
-      "env": {}
+      "env": {},
+      "dataScoping": {
+        "allowedPaths": ["./src", "./docs"],
+        "deniedFiles": [".env*", "*.key", "*.pem", "credentials*", "config/secrets*"],
+        "maxFileSize": "10MB"
+      }
     },
     "github": {
       "command": "npx",
       "args": ["@modelcontextprotocol/server-github@1.3.0"],
       "env": {
         "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "dataScoping": {
+        "allowedRepos": ["ctlops-demo/demo-agent-governed"],
+        "allowedOperations": ["read", "list"],
+        "deniedPaths": [".github/secrets", "*/secrets/*", "*.env*"]
       }
     }
   }
