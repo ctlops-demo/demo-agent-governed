@@ -25,3 +25,14 @@ All other commands require explicit user approval.
 - All functions must have JSDoc comments
 - Tests required for new features
 - Follow existing code patterns
+
+
+## Agent Audit Logging
+
+All agent actions MUST be logged with structured output including:
+- Timestamp, action type, tool name
+- Input parameters (redacted for secrets)
+- Output summary and status
+- Trace ID for correlation
+
+Use structured logging (JSON) and ensure logs are written to an append-only store.
